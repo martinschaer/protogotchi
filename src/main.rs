@@ -20,6 +20,11 @@ const SPI_DC: u8 = 9;
 const SPI_CS: u8 = 1;
 const BACKLIGHT: u8 = 13;
 
+const W_SIZE: usize = 320;
+const H_SIZE: usize = 240;
+// const W: i32 = W_SIZE as i32;
+// const H: i32 = H_SIZE as i32;
+
 fn main() -> ExitCode {
     let gpio = Gpio::new().unwrap();
     let dc = gpio.get(SPI_DC).unwrap().into_output();
@@ -32,11 +37,9 @@ fn main() -> ExitCode {
     let spi = Spi::new(Bus::Spi0, SlaveSelect::Ss1, clock_speed, Mode::Mode0).unwrap();
     let di = SPIInterface::new(spi, dc, cs);
 
-    const W: usize = 240;
-    const H: usize = 320;
     let mut display = Builder::st7789(di)
-        .with_display_size(W as u16, H as u16)
-        // .with_orientation(mipidsi::Orientation::Landscape(false))
+        .with_display_size(H_SIZE as u16, W_SIZE as u16)
+        .with_orientation(mipidsi::Orientation::LandscapeInverted(true))
         .with_invert_colors(mipidsi::ColorInversion::Inverted)
         .init(&mut delay, None::<OutputPin>)
         .unwrap();
@@ -51,6 +54,17 @@ fn main() -> ExitCode {
 
     // Text
     let character_style = MonoTextStyle::new(&FONT_6X10, Rgb565::new(16, 30, 27));
+    let char_w = 6_usize;
+    let cols = W_SIZE / char_w;
+    let line = "**** COMMODORE 64 BASIC V2 ****";
+    let line_cols = line.len();
+    let line_pad = (cols - line_cols) / 2;
+    let mut text = String::new();
+    for _ in 0..line_pad {
+        text.push(' ');
+    }
+    text.push_str(line);
+    text.push_str("\n\n 64K RAM SYSTEM  38911 BASIC BYTES FREE\n\nREADY.\n");
 
     // FPS
     let mut fps = 0_u8;
@@ -78,19 +92,17 @@ fn main() -> ExitCode {
         }
 
         // Backend for the buffer
-        let mut data = [Rgb565::new(9, 14, 21); W * H];
-        let mut fbuf = FrameBuf::new(&mut data, W, H);
+        let mut data = [Rgb565::new(9, 14, 21); W_SIZE * H_SIZE];
+        let mut fbuf = FrameBuf::new(&mut data, W_SIZE, H_SIZE);
 
         // Commodore 64 boot screen
-        let text: String;
-        let prompt =
-            "    **** COMMODORE 64 BASIC V2 ****\n\n 64K RAM SYSTEM  38911 BASIC BYTES FREE\n\nREADY.\n";
+        let print_text: String;
         if count % 2 == 0 {
-            text = format!("{}█", &prompt);
+            print_text = format!("{}█", &text);
         } else {
-            text = prompt.to_string();
+            print_text = text.to_string();
         }
-        Text::new(&text, Point::new(5, 5), character_style)
+        Text::new(&print_text, Point::new(6, 10), character_style)
             .draw(&mut fbuf)
             .unwrap();
 
