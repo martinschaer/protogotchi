@@ -20,13 +20,21 @@ const SPI_DC: u8 = 9;
 const SPI_CS: u8 = 1;
 const BACKLIGHT: u8 = 13;
 
+const BUTTON_A: u8 = 5;
+// const BUTTON_B: u8 = 6;
+// const BUTTON_X: u8 = 16;
+// const BUTTON_Y: u8 = 24;
+
 const W_SIZE: usize = 320;
 const H_SIZE: usize = 240;
 // const W: i32 = W_SIZE as i32;
 // const H: i32 = H_SIZE as i32;
 
+// bg
 const COLOR_BLUE: Rgb565 = Rgb565::new(9, 14, 21);
+// text
 const COLOR_LIGHT_BLUE: Rgb565 = Rgb565::new(16, 30, 27);
+const COLOR_PURPLE: Rgb565 = Rgb565::new(18, 20, 22);
 
 fn main() -> ExitCode {
     let gpio = Gpio::new().unwrap();
@@ -47,13 +55,19 @@ fn main() -> ExitCode {
         .init(&mut delay, None::<OutputPin>)
         .unwrap();
 
+    // Buttons
+    let button_a = gpio.get(BUTTON_A).unwrap().into_input_pullup();
+    // let button_b = gpio.get(BUTTON_B).unwrap().into_input();
+    // let button_x = gpio.get(BUTTON_X).unwrap().into_input();
+    // let button_y = gpio.get(BUTTON_Y).unwrap().into_input();
+
     // Turn on backlight
     backlight.set_low();
     sleep(Duration::from_millis(150));
     backlight.set_high();
 
     // Clear the display initially
-    display.clear(Rgb565::BLUE).unwrap();
+    display.clear(COLOR_BLUE).unwrap();
 
     // Text
     let character_style = MonoTextStyle::new(&FONT_6X10, COLOR_LIGHT_BLUE);
@@ -95,7 +109,12 @@ fn main() -> ExitCode {
         }
 
         // Backend for the buffer
-        let mut data = [COLOR_BLUE; W_SIZE * H_SIZE];
+        let button_a_is_pressed = button_a.is_low();
+        let mut data = [if button_a_is_pressed {
+            COLOR_PURPLE
+        } else {
+            COLOR_BLUE
+        }; W_SIZE * H_SIZE];
         let mut fbuf = FrameBuf::new(&mut data, W_SIZE, H_SIZE);
 
         // Commodore 64 boot screen
