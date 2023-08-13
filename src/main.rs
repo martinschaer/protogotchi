@@ -25,6 +25,10 @@ const BUTTON_A: u8 = 5;
 // const BUTTON_X: u8 = 16;
 // const BUTTON_Y: u8 = 24;
 
+const LED_R: u8 = 17;
+const LED_G: u8 = 27;
+const LED_B: u8 = 22;
+
 const W_SIZE: usize = 320;
 const H_SIZE: usize = 240;
 // const W: i32 = W_SIZE as i32;
@@ -61,6 +65,14 @@ fn main() -> ExitCode {
     // let button_x = gpio.get(BUTTON_X).unwrap().into_input();
     // let button_y = gpio.get(BUTTON_Y).unwrap().into_input();
 
+    // LEDs
+    let mut led_r = gpio.get(LED_R).unwrap().into_output();
+    let mut led_g = gpio.get(LED_G).unwrap().into_output();
+    let mut led_b = gpio.get(LED_B).unwrap().into_output();
+    led_r.set_pwm_frequency(50., 1.).unwrap();
+    led_g.set_pwm_frequency(50., 1.).unwrap();
+    led_b.set_pwm_frequency(50., 1.).unwrap();
+
     // Turn on backlight
     backlight.set_low();
     sleep(Duration::from_millis(150));
@@ -96,6 +108,11 @@ fn main() -> ExitCode {
         fps += 1;
         now = std::time::Instant::now();
         let elapsed = now - last_time;
+
+        // led
+        let y = ((std::time::UNIX_EPOCH.elapsed().unwrap().as_secs_f64()).sin() + 1.) / 2.;
+        let stepped_y = (y * 100.).round();
+        led_r.set_pwm_frequency(50., stepped_y / 100.).unwrap();
 
         if elapsed >= tick {
             last_time = now;
