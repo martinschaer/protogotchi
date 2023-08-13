@@ -25,6 +25,9 @@ const H_SIZE: usize = 240;
 // const W: i32 = W_SIZE as i32;
 // const H: i32 = H_SIZE as i32;
 
+const COLOR_BLUE: Rgb565 = Rgb565::new(9, 14, 21);
+const COLOR_LIGHT_BLUE: Rgb565 = Rgb565::new(16, 30, 27);
+
 fn main() -> ExitCode {
     let gpio = Gpio::new().unwrap();
     let dc = gpio.get(SPI_DC).unwrap().into_output();
@@ -53,7 +56,7 @@ fn main() -> ExitCode {
     display.clear(Rgb565::BLUE).unwrap();
 
     // Text
-    let character_style = MonoTextStyle::new(&FONT_6X10, Rgb565::new(16, 30, 27));
+    let character_style = MonoTextStyle::new(&FONT_6X10, COLOR_LIGHT_BLUE);
     let char_w = 6_usize;
     let cols = W_SIZE / char_w;
     let line = "**** COMMODORE 64 BASIC V2 ****";
@@ -92,7 +95,7 @@ fn main() -> ExitCode {
         }
 
         // Backend for the buffer
-        let mut data = [Rgb565::new(9, 14, 21); W_SIZE * H_SIZE];
+        let mut data = [COLOR_BLUE; W_SIZE * H_SIZE];
         let mut fbuf = FrameBuf::new(&mut data, W_SIZE, H_SIZE);
 
         // Commodore 64 boot screen
