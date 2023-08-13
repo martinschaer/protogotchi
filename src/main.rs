@@ -25,18 +25,19 @@ fn main() -> ExitCode {
     let mut delay = Delay::new();
 
     let clock_speed = 60_000_000_u32;
-    // let clock_speed = 16_000_000_u32;
     let spi = Spi::new(Bus::Spi0, SlaveSelect::Ss1, clock_speed, Mode::Mode0).unwrap();
     let di = SPIInterface::new(spi, dc, cs);
 
+    let w = 240_u16;
+    let h = 320_u16;
     let mut display = Builder::st7789(di)
-        .with_display_size(240, 320)
+        .with_display_size(w, h)
         // .with_orientation(mipidsi::Orientation::Landscape(false))
         .with_invert_colors(mipidsi::ColorInversion::Inverted)
-        // .with_framebuffer_size(width, height)
         .init(&mut delay, None::<OutputPin>)
         .unwrap();
 
+    // Turn on backlight
     backlight.set_low();
     sleep(Duration::from_millis(150));
     backlight.set_high();
@@ -45,18 +46,16 @@ fn main() -> ExitCode {
     let style = PrimitiveStyleBuilder::new()
         .fill_color(Rgb565::BLACK)
         .build();
-    Rectangle::new(Point::new(0, 0), Size::new(240, 320))
+    Rectangle::new(Point::new(0, 0), Size::new(w.into(), h.into()))
         .into_styled(style)
         .draw(&mut display)
         .unwrap();
     sleep(Duration::from_millis(150));
 
-    let red = Rgb565::RED;
-
     loop {
         // Fill the display with red
-        let style = PrimitiveStyleBuilder::new().fill_color(red).build();
-        Rectangle::new(Point::new(0, 0), Size::new(240, 320))
+        let style = PrimitiveStyleBuilder::new().fill_color(Rgb565::RED).build();
+        Rectangle::new(Point::new(0, 0), Size::new(w.into(), h.into()))
             .into_styled(style)
             .draw(&mut display)
             .unwrap();
@@ -68,7 +67,7 @@ fn main() -> ExitCode {
         let style = PrimitiveStyleBuilder::new()
             .fill_color(Rgb565::BLUE)
             .build();
-        Rectangle::new(Point::new(0, 0), Size::new(240, 320))
+        Rectangle::new(Point::new(0, 0), Size::new(w.into(), h.into()))
             .into_styled(style)
             .draw(&mut display)
             .unwrap();
@@ -76,6 +75,4 @@ fn main() -> ExitCode {
         // Wait for some time
         sleep(Duration::from_millis(500));
     }
-
-    // ExitCode::SUCCESS
 }
