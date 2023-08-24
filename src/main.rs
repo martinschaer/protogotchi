@@ -110,7 +110,7 @@ fn main() -> ExitCode {
         let elapsed = now - last_time;
 
         // led
-        let y = ((std::time::UNIX_EPOCH.elapsed().unwrap().as_secs_f64()).sin() + 1.) / 2.;
+        let y = ((std::time::UNIX_EPOCH.elapsed().unwrap().as_secs_f64()).sin() + 1.) * 0.5;
         let stepped_y = (y * 100.).round();
         led_r.set_pwm_frequency(50., stepped_y / 100.).unwrap();
 
