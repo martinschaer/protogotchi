@@ -4,8 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+bevy = { version = "0.11.2", default-features = false }
 display-interface-spi = "0.4.1"
 embedded-graphics = "0.8.0"
 embedded-graphics-framebuf = "0.5.0"
 mipidsi = "0.7.1"
 rppal = { version = "0.14.1", features = ["hal"] }
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
