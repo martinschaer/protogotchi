@@ -1,7 +1,5 @@
 use bevy::prelude::*;
 use display_interface_spi::SPIInterfaceNoCS;
-use embedded_graphics::mono_font::MonoTextStyle;
-use embedded_graphics::pixelcolor::Rgb565;
 use mipidsi::Display;
 use mipidsi::{models::ST7789, Builder};
 use rppal::gpio::{Gpio, InputPin, OutputPin};
@@ -9,7 +7,7 @@ use rppal::hal::Delay;
 use rppal::spi::{Bus, Mode, SlaveSelect, Spi};
 use std::sync::Mutex;
 
-use super::{H_SIZE, W_SIZE};
+use crate::{H_SIZE, W_SIZE};
 
 const SPI_DC: u8 = 9;
 const BACKLIGHT: u8 = 13;
@@ -22,11 +20,6 @@ const BUTTON_Y: u8 = 24;
 const LED_R: u8 = 17;
 const LED_G: u8 = 27;
 const LED_B: u8 = 22;
-
-#[derive(Resource)]
-pub struct UIConfig {
-    pub character_style: MonoTextStyle<'static, Rgb565>,
-}
 
 #[derive(Resource)]
 #[allow(dead_code)]

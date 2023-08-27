@@ -1,19 +1,21 @@
 use bevy::prelude::*;
+use embedded_graphics::{
+    mono_font::{ascii::FONT_6X10, MonoTextStyle},
+    prelude::*,
+    text::Text,
+};
+use embedded_graphics_framebuf::FrameBuf;
 use local_ip_address::local_ip;
 
-use super::resources::GameState;
-// use crate::W_SIZE;
+use super::resources::{GameState, UIConfig};
+use crate::{Render, COLOR_LIGHT_BLUE, H_SIZE, W_SIZE};
 
-pub fn startup(mut game_state: ResMut<GameState>) {
-    // let char_w = 6_usize;
-    // let cols = W_SIZE / char_w;
+pub fn startup(mut commands: Commands, mut game_state: ResMut<GameState>) {
+    commands.insert_resource(UIConfig {
+        character_style: MonoTextStyle::new(&FONT_6X10, COLOR_LIGHT_BLUE),
+    });
+
     let line = "**** COMMODORE 64 BASIC V2 ****";
-    // let line_cols = line.len();
-    // let line_pad = (cols - line_cols) / 2;
-    // game_state.text = String::new();
-    // for _ in 0..line_pad {
-    //     game_state.text.push(' ');
-    // }
     game_state.text.push_str(line);
     game_state
         .text
@@ -27,4 +29,24 @@ pub fn startup(mut game_state: ResMut<GameState>) {
     game_state
         .text
         .push_str(&format!("hostname: {}\nIP: {}\n", hostname, my_local_ip));
+}
+
+pub fn render_loop(
+    time: Res<Time>,
+    ui_config: ResMut<UIConfig>,
+    game_state: Res<GameState>,
+    mut render: Local<Render>,
+) {
+    let elapsed = time.elapsed_seconds_f64();
+
+    let print_text: String;
+    if elapsed % 0.5 < 0.25 {
+        print_text = format!("{}█", &game_state.text);
+    } else {
+        print_text = game_state.text.to_string();
+    }
+    let mut fbuf = FrameBuf::new(&mut render.data, W_SIZE, H_SIZE);
+    Text::new(&print_text, Point::new(6, 10), ui_config.character_style)
+        .draw(&mut fbuf)
+        .unwrap();
 }
