@@ -1,19 +1,26 @@
 #[cfg(target_os = "linux")]
 pub mod hardware;
 
+#[cfg(target_os = "macos")]
+pub mod sim;
+
 pub mod menu;
 
-use bevy::{app::ScheduleRunnerPlugin, prelude::*};
+use bevy::prelude::*;
+
+#[cfg(target_os = "linux")]
+use bevy::app::ScheduleRunnerPlugin;
+
+#[cfg(target_os = "linux")]
 use std::time::Duration;
 
 #[cfg(target_os = "linux")]
 use hardware::HardwarePlugin;
 
-#[cfg(target_os = "linux")]
-use embedded_graphics::pixelcolor::Rgb565;
-
 #[cfg(target_os = "macos")]
-use embedded_graphics::{pixelcolor::Rgb565};
+use sim::SimPlugin;
+
+use embedded_graphics::pixelcolor::Rgb565;
 
 use menu::MenuPlugin;
 
@@ -58,11 +65,8 @@ fn main() {
 fn main() {
     App::new()
         .init_resource::<Render>()
-        .add_plugins(
-            MinimalPlugins.set(ScheduleRunnerPlugin::run_loop(Duration::from_secs_f64(
-                1.0 / 60.0,
-            ))),
-        )
+        .add_plugins(DefaultPlugins)
+        .add_plugins(SimPlugin)
         .add_plugins(MenuPlugin)
         .run();
 }
