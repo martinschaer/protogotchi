@@ -39,7 +39,7 @@ const COLOR_BLUE: Rgb565 = Rgb565::new(9, 14, 21);
 const COLOR_LIGHT_BLUE: Rgb565 = Rgb565::new(16, 30, 27);
 const COLOR_PURPLE: Rgb565 = Rgb565::new(18, 20, 22);
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 struct GameState {
     text: String,
 }
@@ -190,7 +190,8 @@ fn main() {
                 1.0 / 60.0,
             ))),
         )
-        // .init_resource::<Hardware>()
+        .init_resource::<Hardware>()
+        .init_resource::<GameState>()
         .add_systems(Startup, startup)
         .add_systems(Update, render_loop)
         .run();
