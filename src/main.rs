@@ -1,5 +1,4 @@
 use bevy::{app::ScheduleRunnerPlugin, prelude::*};
-
 use display_interface_spi::SPIInterfaceNoCS;
 use embedded_graphics::{
     mono_font::{ascii::FONT_6X10, MonoTextStyle},
@@ -9,6 +8,7 @@ use embedded_graphics::{
     text::Text,
 };
 use embedded_graphics_framebuf::FrameBuf;
+use local_ip_address::local_ip;
 use mipidsi::Display;
 use mipidsi::{models::ST7789, Builder};
 use rppal::gpio::{Gpio, InputPin, OutputPin};
@@ -127,6 +127,15 @@ fn startup(
     game_state
         .text
         .push_str("\n\n 64K RAM SYSTEM  38911 BASIC BYTES FREE\n\nREADY.\n");
+
+    // get IP
+    let hostname = std::process::Command::new("hostname").output().unwrap();
+    let hostname = hostname.stdout;
+    let hostname = String::from_utf8(hostname).unwrap();
+    let my_local_ip = local_ip().unwrap();
+    game_state
+        .text
+        .push_str(&format!("hostname: {}\nIP: {}\n", hostname, my_local_ip));
 }
 
 fn render_loop(

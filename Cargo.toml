@@ -8,6 +8,7 @@ bevy = { version = "0.11.2", default-features = false }
 display-interface-spi = "0.4.1"
 embedded-graphics = "0.8.0"
 embedded-graphics-framebuf = "0.5.0"
+local-ip-address = "0.5.4"
 mipidsi = "0.7.1"
 rppal = { version = "0.14.1", features = ["hal"] }
 
