@@ -8,9 +8,8 @@ use embedded_graphics::{
 use embedded_graphics_framebuf::FrameBuf;
 
 use super::resources::{Hardware, UIConfig};
-use crate::{
-    menu::resources::GameState, COLOR_BLUE, COLOR_LIGHT_BLUE, COLOR_PURPLE, H_SIZE, W_SIZE,
-};
+use super::{COLOR_BLUE, COLOR_LIGHT_BLUE, COLOR_PURPLE, H_SIZE, W_SIZE};
+use crate::menu::resources::GameState;
 
 pub fn startup(mut commands: Commands, mut hardware: ResMut<Hardware>) {
     commands.insert_resource(UIConfig {

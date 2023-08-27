@@ -9,7 +9,7 @@ use rppal::hal::Delay;
 use rppal::spi::{Bus, Mode, SlaveSelect, Spi};
 use std::sync::Mutex;
 
-use crate::{H_SIZE, W_SIZE};
+use super::{H_SIZE, W_SIZE};
 
 const SPI_DC: u8 = 9;
 const BACKLIGHT: u8 = 13;

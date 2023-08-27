@@ -11,7 +11,6 @@ pub struct MenuPlugin;
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<GameState>()
-            .add_systems(Startup, startup)
             .add_systems(Startup, startup);
     }
 }

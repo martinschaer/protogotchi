@@ -2,18 +2,18 @@ use bevy::prelude::*;
 use local_ip_address::local_ip;
 
 use super::resources::GameState;
-use crate::W_SIZE;
+// use crate::W_SIZE;
 
 pub fn startup(mut game_state: ResMut<GameState>) {
-    let char_w = 6_usize;
-    let cols = W_SIZE / char_w;
+    // let char_w = 6_usize;
+    // let cols = W_SIZE / char_w;
     let line = "**** COMMODORE 64 BASIC V2 ****";
-    let line_cols = line.len();
-    let line_pad = (cols - line_cols) / 2;
-    game_state.text = String::new();
-    for _ in 0..line_pad {
-        game_state.text.push(' ');
-    }
+    // let line_cols = line.len();
+    // let line_pad = (cols - line_cols) / 2;
+    // game_state.text = String::new();
+    // for _ in 0..line_pad {
+    //     game_state.text.push(' ');
+    // }
     game_state.text.push_str(line);
     game_state
         .text
