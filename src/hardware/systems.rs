@@ -19,7 +19,7 @@ pub fn startup(mut hardware: ResMut<Hardware>) {
 pub fn render_loop(
     time: Res<Time>,
     mut hardware: ResMut<Hardware>,
-    mut render: Local<Render>,
+    mut render: ResMut<Render>,
 ) {
     let elapsed = time.elapsed_seconds_f64();
 

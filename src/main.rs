@@ -8,6 +8,9 @@ pub mod menu;
 
 use bevy::prelude::*;
 
+#[cfg(target_os = "macos")]
+use bevy_pixels::prelude::*;
+
 #[cfg(target_os = "linux")]
 use bevy::app::ScheduleRunnerPlugin;
 
@@ -37,7 +40,7 @@ const H_SIZE: usize = 240;
 
 #[derive(Resource)]
 pub struct Render {
-    data: [Rgb565; W_SIZE * H_SIZE],
+    pub data: [Rgb565; W_SIZE * H_SIZE],
 }
 
 impl Default for Render {
@@ -65,8 +68,9 @@ fn main() {
 fn main() {
     App::new()
         .init_resource::<Render>()
+        .add_systems(Update, bevy::window::close_on_esc)
         .add_plugins(DefaultPlugins)
-        .add_plugins(SimPlugin)
         .add_plugins(MenuPlugin)
+        .add_plugins(SimPlugin)
         .run();
 }

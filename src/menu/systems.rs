@@ -8,7 +8,7 @@ use embedded_graphics_framebuf::FrameBuf;
 use local_ip_address::local_ip;
 
 use super::resources::{GameState, UIConfig};
-use crate::{Render, COLOR_LIGHT_BLUE, H_SIZE, W_SIZE};
+use crate::{Render, COLOR_BLUE, COLOR_LIGHT_BLUE, H_SIZE, W_SIZE};
 
 pub fn startup(mut commands: Commands, mut game_state: ResMut<GameState>) {
     commands.insert_resource(UIConfig {
@@ -35,7 +35,7 @@ pub fn render_loop(
     time: Res<Time>,
     ui_config: ResMut<UIConfig>,
     game_state: Res<GameState>,
-    mut render: Local<Render>,
+    mut render: ResMut<Render>,
 ) {
     let elapsed = time.elapsed_seconds_f64();
 
@@ -45,6 +45,7 @@ pub fn render_loop(
     } else {
         print_text = game_state.text.to_string();
     }
+    render.data.fill(COLOR_BLUE);
     let mut fbuf = FrameBuf::new(&mut render.data, W_SIZE, H_SIZE);
     Text::new(&print_text, Point::new(6, 10), ui_config.character_style)
         .draw(&mut fbuf)

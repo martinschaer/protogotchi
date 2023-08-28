@@ -15,7 +15,7 @@ mipidsi = "0.7.1"
 rppal = { version = "0.14.1", features = ["hal"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
-bevy = "0.11.2"
+bevy_pixels = "0.11.0"
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]
