@@ -10,5 +10,4 @@ pub struct UIConfig {
 #[derive(Resource, Default)]
 pub struct GameState {
     pub text: String,
-    pub button_a_pressed: bool,
 }

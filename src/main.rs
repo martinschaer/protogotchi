@@ -5,6 +5,8 @@ pub mod hardware;
 pub mod sim;
 
 pub mod menu;
+mod splash;
+mod systems;
 
 use bevy::prelude::*;
 
@@ -26,6 +28,8 @@ use sim::SimPlugin;
 use embedded_graphics::pixelcolor::Rgb565;
 
 use menu::MenuPlugin;
+use splash::SplashPlugin;
+use systems::{transition_to_menu_state, transition_to_splash_state};
 
 // bg
 const COLOR_BLUE: Rgb565 = Rgb565::new(9, 14, 21);
@@ -33,7 +37,7 @@ const COLOR_BLUE: Rgb565 = Rgb565::new(9, 14, 21);
 const COLOR_LIGHT_BLUE: Rgb565 = Rgb565::new(16, 30, 27);
 // palette
 //
-// const COLOR_PURPLE: Rgb565 = Rgb565::new(18, 20, 22);
+const COLOR_PURPLE: Rgb565 = Rgb565::new(18, 20, 22);
 
 const W_SIZE: usize = 320;
 const H_SIZE: usize = 240;
@@ -41,12 +45,16 @@ const H_SIZE: usize = 240;
 #[derive(Resource)]
 pub struct Render {
     pub data: [Rgb565; W_SIZE * H_SIZE],
+    pub button_a_pressed: bool,
 }
 
 impl Default for Render {
     fn default() -> Self {
         let data: [Rgb565; W_SIZE * H_SIZE] = [COLOR_BLUE; W_SIZE * H_SIZE];
-        Render { data }
+        Render {
+            data,
+            button_a_pressed: false,
+        }
     }
 }
 
@@ -54,13 +62,20 @@ impl Default for Render {
 fn main() {
     App::new()
         .init_resource::<Render>()
+        // Bevy Plugins
         .add_plugins(
             MinimalPlugins.set(ScheduleRunnerPlugin::run_loop(Duration::from_secs_f64(
                 1.0 / 60.0,
             ))),
         )
+        // My Plugins
         .add_plugins(HardwarePlugin)
         .add_plugins(MenuPlugin)
+        .add_plugins(SplashPlugin)
+        // Systems
+        .add_systems(Update, transition_to_splash_state)
+        .add_systems(Update, transition_to_menu_state)
+        // Run
         .run();
 }
 
@@ -68,9 +83,24 @@ fn main() {
 fn main() {
     App::new()
         .init_resource::<Render>()
-        .add_systems(Update, bevy::window::close_on_esc)
+        .add_state::<AppState>()
+        // Bevy Plugins
         .add_plugins(DefaultPlugins)
+        // My Plugins
         .add_plugins(MenuPlugin)
+        .add_plugins(SplashPlugin)
         .add_plugins(SimPlugin)
+        // Systems
+        .add_systems(Update, transition_to_splash_state)
+        .add_systems(Update, transition_to_menu_state)
+        .add_systems(Update, bevy::window::close_on_esc)
+        // Run
         .run();
+}
+
+#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
+pub enum AppState {
+    #[default]
+    Splash,
+    Menu,
 }

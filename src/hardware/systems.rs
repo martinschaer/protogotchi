@@ -16,11 +16,7 @@ pub fn startup(mut hardware: ResMut<Hardware>) {
     hardware.backlight.set_high();
 }
 
-pub fn render_loop(
-    time: Res<Time>,
-    mut hardware: ResMut<Hardware>,
-    mut render: ResMut<Render>,
-) {
+pub fn render_loop(time: Res<Time>, mut hardware: ResMut<Hardware>, mut render: ResMut<Render>) {
     let elapsed = time.elapsed_seconds_f64();
 
     // led
@@ -39,4 +35,8 @@ pub fn render_loop(
         .unwrap()
         .fill_contiguous(&area, render.data)
         .unwrap();
+}
+
+pub fn buttons(mut render: ResMut<Render>, hardware: ResMut<Hardware>) {
+    render.button_a_pressed = hardware.button_a.is_low();
 }

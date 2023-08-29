@@ -22,6 +22,10 @@ fn render_loop(mut wrapper_query: Query<&mut PixelsWrapper>, render: ResMut<Rend
     frame.copy_from_slice(&pixels);
 }
 
+fn buttons(keyboard_input: Res<Input<KeyCode>>, mut render: ResMut<Render>) {
+    render.button_a_pressed = keyboard_input.pressed(KeyCode::A)
+}
+
 impl Plugin for SimPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(PixelsPlugin {
@@ -34,6 +38,7 @@ impl Plugin for SimPlugin {
             }),
         })
         .add_systems(Startup, setup)
+        .add_systems(Update, buttons)
         .add_systems(Draw, render_loop);
     }
 }
