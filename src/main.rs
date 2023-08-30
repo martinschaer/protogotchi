@@ -1,10 +1,11 @@
 #[cfg(target_os = "linux")]
-pub mod hardware;
+mod hardware;
 
 #[cfg(target_os = "macos")]
-pub mod sim;
+mod sim;
 
-pub mod menu;
+mod menu;
+mod settings;
 mod splash;
 mod systems;
 
@@ -28,8 +29,9 @@ use sim::SimPlugin;
 use embedded_graphics::pixelcolor::Rgb565;
 
 use menu::MenuPlugin;
+use settings::SettingsPlugin;
 use splash::SplashPlugin;
-use systems::{transition_to_menu_state, transition_to_splash_state};
+use systems::transition_to_splash_state;
 
 // bg
 const COLOR_BLUE: Rgb565 = Rgb565::new(9, 14, 21);
@@ -45,7 +47,11 @@ const H_SIZE: usize = 240;
 #[derive(Resource)]
 pub struct Render {
     pub data: [Rgb565; W_SIZE * H_SIZE],
+    // pub route: String,
     pub button_a_pressed: bool,
+    pub button_b_pressed: bool,
+    pub button_x_pressed: bool,
+    pub button_y_pressed: bool,
 }
 
 impl Default for Render {
@@ -53,7 +59,11 @@ impl Default for Render {
         let data: [Rgb565; W_SIZE * H_SIZE] = [COLOR_BLUE; W_SIZE * H_SIZE];
         Render {
             data,
+            // route: String::from("/"),
             button_a_pressed: false,
+            button_b_pressed: false,
+            button_x_pressed: false,
+            button_y_pressed: false,
         }
     }
 }
@@ -71,10 +81,10 @@ fn main() {
         // My Plugins
         .add_plugins(HardwarePlugin)
         .add_plugins(MenuPlugin)
+        .add_plugins(SettingsPlugin)
         .add_plugins(SplashPlugin)
         // Systems
         .add_systems(Update, transition_to_splash_state)
-        .add_systems(Update, transition_to_menu_state)
         // Run
         .run();
 }
@@ -88,11 +98,11 @@ fn main() {
         .add_plugins(DefaultPlugins)
         // My Plugins
         .add_plugins(MenuPlugin)
-        .add_plugins(SplashPlugin)
+        .add_plugins(SettingsPlugin)
         .add_plugins(SimPlugin)
+        .add_plugins(SplashPlugin)
         // Systems
         .add_systems(Update, transition_to_splash_state)
-        .add_systems(Update, transition_to_menu_state)
         .add_systems(Update, bevy::window::close_on_esc)
         // Run
         .run();
@@ -103,4 +113,5 @@ pub enum AppState {
     #[default]
     Splash,
     Menu,
+    Settings,
 }

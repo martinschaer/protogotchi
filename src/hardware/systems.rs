@@ -39,4 +39,7 @@ pub fn render_loop(time: Res<Time>, mut hardware: ResMut<Hardware>, mut render: 
 
 pub fn buttons(mut render: ResMut<Render>, hardware: ResMut<Hardware>) {
     render.button_a_pressed = hardware.button_a.is_low();
+    render.button_b_pressed = hardware.button_b.is_low();
+    render.button_x_pressed = hardware.button_x.is_low();
+    render.button_y_pressed = hardware.button_y.is_low();
 }

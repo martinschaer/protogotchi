@@ -6,8 +6,6 @@ use crate::{Render, H_SIZE, W_SIZE};
 
 pub struct SimPlugin;
 
-fn setup() {}
-
 fn render_loop(mut wrapper_query: Query<&mut PixelsWrapper>, render: ResMut<Render>) {
     let Ok(mut wrapper) = wrapper_query.get_single_mut() else { return };
     let frame = wrapper.pixels.frame_mut();
@@ -23,7 +21,10 @@ fn render_loop(mut wrapper_query: Query<&mut PixelsWrapper>, render: ResMut<Rend
 }
 
 fn buttons(keyboard_input: Res<Input<KeyCode>>, mut render: ResMut<Render>) {
-    render.button_a_pressed = keyboard_input.pressed(KeyCode::A)
+    render.button_a_pressed = keyboard_input.pressed(KeyCode::A);
+    render.button_b_pressed = keyboard_input.pressed(KeyCode::B);
+    render.button_x_pressed = keyboard_input.pressed(KeyCode::X);
+    render.button_y_pressed = keyboard_input.pressed(KeyCode::Y);
 }
 
 impl Plugin for SimPlugin {
@@ -37,7 +38,6 @@ impl Plugin for SimPlugin {
                 auto_resize_surface: false,
             }),
         })
-        .add_systems(Startup, setup)
         .add_systems(Update, buttons)
         .add_systems(Draw, render_loop);
     }
