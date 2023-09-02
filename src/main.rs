@@ -30,7 +30,6 @@ use sim::SimPlugin;
 use menu::MenuPlugin;
 use settings::SettingsPlugin;
 use splash::SplashPlugin;
-use systems::transition_to_splash_state;
 
 // bg
 // const COLOR_888_BG: Rgb888 = Rgb888::new(0xef, 0xfa, 0xfa);
@@ -85,7 +84,6 @@ fn main() {
         .add_plugins(SettingsPlugin)
         .add_plugins(SplashPlugin)
         // Systems
-        .add_systems(Update, transition_to_splash_state)
         // Run
         .run();
 }
@@ -103,7 +101,6 @@ fn main() {
         .add_plugins(SimPlugin)
         .add_plugins(SplashPlugin)
         // Systems
-        .add_systems(Update, transition_to_splash_state)
         .add_systems(Update, bevy::window::close_on_esc)
         // Run
         .run();

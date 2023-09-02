@@ -15,20 +15,21 @@ pub fn startup(mut commands: Commands, mut game_state: ResMut<MenuState>) {
         character_style: MonoTextStyle::new(&FONT_6X10, COLOR_FG),
     });
 
-    let line = "**** COMMODORE 64 BASIC V2 ****";
+    let line = "**** Welcome to the cozigotchi terminal ^_^ ****\n\n";
     game_state.text.push_str(line);
-    game_state
-        .text
-        .push_str("\n\n 64K RAM SYSTEM  38911 BASIC BYTES FREE\n\nREADY.\n");
 
     // get IP
     let hostname = std::process::Command::new("hostname").output().unwrap();
     let hostname = hostname.stdout;
     let hostname = String::from_utf8(hostname).unwrap();
-    let my_local_ip = local_ip().unwrap();
-    game_state
-        .text
-        .push_str(&format!("hostname: {}\nIP: {}\n", hostname, my_local_ip));
+    let my_local_ip = match local_ip() {
+        Ok(ip) => ip.to_string(),
+        Err(x) => format!("{:?}", x),
+    };
+    game_state.text.push_str(&format!(
+        "hostname: {}\nIP: {}\n\nPress X for Settings\n\n",
+        hostname, my_local_ip
+    ));
 }
 
 pub fn on_enter(time: Res<Time>, mut state: ResMut<MenuState>) {
@@ -46,7 +47,7 @@ pub fn render_loop(
 
     let print_text: String;
     if elapsed % 0.5 < 0.25 {
-        print_text = format!("{}█", &game_state.text);
+        print_text = format!("{}_", &game_state.text);
     } else {
         print_text = game_state.text.to_string();
     }

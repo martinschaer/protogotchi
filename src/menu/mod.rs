@@ -3,7 +3,7 @@ mod systems;
 
 use bevy::prelude::*;
 
-use crate::AppState;
+use crate::{systems::transition_to_splash_state, AppState};
 use resources::MenuState;
 use systems::{navigation, on_enter, render_loop, startup};
 
@@ -16,7 +16,8 @@ impl Plugin for MenuPlugin {
             .add_systems(OnEnter(AppState::Menu), on_enter)
             .add_systems(
                 Update,
-                (navigation, render_loop).run_if(in_state(AppState::Menu)),
+                (navigation, render_loop, transition_to_splash_state)
+                    .run_if(in_state(AppState::Menu)),
             );
     }
 }
