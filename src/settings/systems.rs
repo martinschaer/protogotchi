@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::AppState;
 use crate::Render;
-use crate::COLOR_LIGHT_BLUE;
+use crate::COLOR_FG;
 
 use super::resources::SettingsState;
 
@@ -12,7 +12,7 @@ pub fn on_enter(time: Res<Time>, mut state: ResMut<SettingsState>) {
 }
 
 pub fn update(mut render: ResMut<Render>) {
-    render.data.fill(COLOR_LIGHT_BLUE)
+    render.data.fill(COLOR_FG)
 }
 
 pub fn navigation(

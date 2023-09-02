@@ -8,11 +8,11 @@ use embedded_graphics_framebuf::FrameBuf;
 use local_ip_address::local_ip;
 
 use super::resources::{MenuState, UIConfig};
-use crate::{AppState, Render, COLOR_BLUE, COLOR_LIGHT_BLUE, H_SIZE, W_SIZE};
+use crate::{AppState, Render, COLOR_BG, COLOR_FG, H_SIZE, W_SIZE};
 
 pub fn startup(mut commands: Commands, mut game_state: ResMut<MenuState>) {
     commands.insert_resource(UIConfig {
-        character_style: MonoTextStyle::new(&FONT_6X10, COLOR_LIGHT_BLUE),
+        character_style: MonoTextStyle::new(&FONT_6X10, COLOR_FG),
     });
 
     let line = "**** COMMODORE 64 BASIC V2 ****";
@@ -50,7 +50,7 @@ pub fn render_loop(
     } else {
         print_text = game_state.text.to_string();
     }
-    render.data.fill(COLOR_BLUE);
+    render.data.fill(COLOR_BG);
     let mut fbuf = FrameBuf::new(&mut render.data, W_SIZE, H_SIZE);
     Text::new(&print_text, Point::new(6, 10), ui_config.character_style)
         .draw(&mut fbuf)

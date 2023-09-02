@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::AppState;
 use crate::Render;
-use crate::COLOR_PURPLE;
+use crate::COLOR_PRIMARY;
 
 use super::SplashState;
 
@@ -17,7 +17,7 @@ pub fn update(
     mut app_state_next_state: ResMut<NextState<AppState>>,
     state: Res<SplashState>,
 ) {
-    render.data.fill(COLOR_PURPLE);
+    render.data.fill(COLOR_PRIMARY);
     let now = time.elapsed_seconds();
     if now > 5. + state.entered {
         app_state_next_state.set(AppState::Menu);

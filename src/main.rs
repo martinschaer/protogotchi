@@ -10,6 +10,7 @@ mod splash;
 mod systems;
 
 use bevy::prelude::*;
+use embedded_graphics::pixelcolor::Rgb565;
 
 #[cfg(target_os = "macos")]
 use bevy_pixels::prelude::*;
@@ -26,20 +27,20 @@ use hardware::HardwarePlugin;
 #[cfg(target_os = "macos")]
 use sim::SimPlugin;
 
-use embedded_graphics::pixelcolor::Rgb565;
-
 use menu::MenuPlugin;
 use settings::SettingsPlugin;
 use splash::SplashPlugin;
 use systems::transition_to_splash_state;
 
 // bg
-const COLOR_BLUE: Rgb565 = Rgb565::new(9, 14, 21);
+// const COLOR_888_BG: Rgb888 = Rgb888::new(0xef, 0xfa, 0xfa);
+const COLOR_BG: Rgb565 = Rgb565::new(0b11101, 0b111110, 0b11111);
 // text
-const COLOR_LIGHT_BLUE: Rgb565 = Rgb565::new(16, 30, 27);
-// palette
-//
-const COLOR_PURPLE: Rgb565 = Rgb565::new(18, 20, 22);
+const COLOR_FG: Rgb565 = Rgb565::new(0b00001, 0b001001, 0b00100);
+// primary
+const COLOR_PRIMARY: Rgb565 = Rgb565::new(0b0, 0b011110, 0b01110);
+// const COLOR_SECONDARY: Rgb565 = Rgb565::from(Rgb888::new(0xd4, 0xf2, 0xf1));
+// const COLOR_ACCENT: Rgb565 = Rgb565::from(Rgb888::new(0xc2, 0x38, 0x3f));
 
 const W_SIZE: usize = 320;
 const H_SIZE: usize = 240;
@@ -56,7 +57,7 @@ pub struct Render {
 
 impl Default for Render {
     fn default() -> Self {
-        let data: [Rgb565; W_SIZE * H_SIZE] = [COLOR_BLUE; W_SIZE * H_SIZE];
+        let data: [Rgb565; W_SIZE * H_SIZE] = [COLOR_BG; W_SIZE * H_SIZE];
         Render {
             data,
             // route: String::from("/"),
