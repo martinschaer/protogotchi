@@ -30,7 +30,7 @@ pub fn update(mut render: ResMut<Render>, state: Res<SettingsState>) {
     render.data.fill(COLOR_BG);
     let mut fbuf = FrameBuf::new(&mut render.data, W_SIZE, H_SIZE);
     Text::new(
-        &print_text,
+        print_text,
         Point::new(6, 10),
         MonoTextStyle::new(&FONT_6X10, COLOR_FG),
     )
@@ -59,7 +59,7 @@ pub fn navigation(
         } else if render.button_a_pressed {
             match state.selected {
                 Setting::Wifi => {
-                    state.selected = Setting::Back;
+                    // state.selected = Setting::Back;
                 }
                 Setting::Back => {
                     state.selected = Setting::Wifi;
@@ -72,7 +72,7 @@ pub fn navigation(
                     state.selected = Setting::Back;
                 }
                 Setting::Back => {
-                    state.selected = Setting::Wifi;
+                    // state.selected = Setting::Wifi;
                 }
             }
             state.debounce = now;

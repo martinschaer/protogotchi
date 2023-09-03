@@ -45,12 +45,11 @@ pub fn render_loop(
 ) {
     let elapsed = time.elapsed_seconds_f64();
 
-    let print_text: String;
-    if elapsed % 0.5 < 0.25 {
-        print_text = format!("{}_", &game_state.text);
+    let print_text = if elapsed % 0.5 < 0.25 {
+        format!("{}_", &game_state.text)
     } else {
-        print_text = game_state.text.to_string();
-    }
+        game_state.text.to_string()
+    };
     render.data.fill(COLOR_BG);
     let mut fbuf = FrameBuf::new(&mut render.data, W_SIZE, H_SIZE);
     Text::new(&print_text, Point::new(6, 10), ui_config.character_style)
@@ -65,9 +64,7 @@ pub fn navigation(
     state: Res<MenuState>,
 ) {
     let now = time.elapsed_seconds();
-    if now > 0.2 + state.entered {
-        if render.button_x_pressed {
-            app_state_next_state.set(AppState::Settings);
-        }
+    if now > 0.2 + state.entered && render.button_x_pressed {
+        app_state_next_state.set(AppState::Settings);
     }
 }

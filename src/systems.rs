@@ -8,9 +8,7 @@ pub fn transition_to_splash_state(
     app_state: Res<State<AppState>>,
     mut app_state_next_state: ResMut<NextState<AppState>>,
 ) {
-    if render.button_a_pressed {
-        if app_state.get().to_owned() != AppState::Splash {
-            app_state_next_state.set(AppState::Splash);
-        }
+    if render.button_a_pressed && *app_state.get() != AppState::Splash {
+        app_state_next_state.set(AppState::Splash);
     }
 }
