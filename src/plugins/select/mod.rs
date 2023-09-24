@@ -19,6 +19,8 @@ impl Plugin for SelectPlugin {
             options: vec![],
         };
         app.insert_resource(state)
+            // TODO: make sure `update` runs after other content has been rendered
+            //   label this as "modal", and label other `update`s with "content" and "splash"  
             .add_systems(Update, (navigation, update));
     }
 }
