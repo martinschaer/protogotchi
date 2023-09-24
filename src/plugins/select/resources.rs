@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
 #[derive(Resource)]
-pub struct SettingsState {
+pub struct SelectState {
+    pub display: bool,
     pub entered: f32,
     pub debounce: f32,
     pub selected: usize,

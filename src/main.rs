@@ -5,6 +5,7 @@ mod hardware;
 mod sim;
 
 mod menu;
+mod plugins;
 mod settings;
 mod splash;
 mod systems;
@@ -28,6 +29,7 @@ use hardware::HardwarePlugin;
 use sim::SimPlugin;
 
 use menu::MenuPlugin;
+use plugins::select::SelectPlugin;
 use settings::SettingsPlugin;
 use splash::SplashPlugin;
 
@@ -79,6 +81,7 @@ fn main() {
             ))),
         )
         // My Plugins
+        .add_plugins(SelectPlugin)
         .add_plugins(HardwarePlugin)
         .add_plugins(MenuPlugin)
         .add_plugins(SettingsPlugin)
@@ -96,6 +99,7 @@ fn main() {
         // Bevy Plugins
         .add_plugins(DefaultPlugins)
         // My Plugins
+        .add_plugins(SelectPlugin)
         .add_plugins(MenuPlugin)
         .add_plugins(SettingsPlugin)
         .add_plugins(SimPlugin)
