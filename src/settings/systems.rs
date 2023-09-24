@@ -13,7 +13,7 @@ use crate::COLOR_FG;
 use crate::H_SIZE;
 use crate::W_SIZE;
 
-use super::resources::{Setting, SettingsState};
+use super::resources::SettingsState;
 
 pub fn on_enter(time: Res<Time>, mut state: ResMut<SettingsState>) {
     state.entered = time.elapsed_seconds();
@@ -23,14 +23,23 @@ pub fn on_enter(time: Res<Time>, mut state: ResMut<SettingsState>) {
 pub fn update(mut render: ResMut<Render>, state: Res<SettingsState>) {
     render.data.fill(COLOR_FG);
 
-    let print_text = match state.selected {
-        Setting::Wifi => "> Wifi\n  Back",
-        Setting::Back => "  Wifi\n> Back",
-    };
+    let print_text = state
+        .options
+        .iter()
+        .enumerate()
+        .fold(String::from(""), |mut acc, (i, o)| {
+            if state.selected == i {
+                acc.push_str("\n> ");
+            } else {
+                acc.push_str("\n  ");
+            }
+            acc.push_str(o);
+            acc
+        });
     render.data.fill(COLOR_BG);
     let mut fbuf = FrameBuf::new(&mut render.data, W_SIZE, H_SIZE);
     Text::new(
-        print_text,
+        &print_text,
         Point::new(6, 10),
         MonoTextStyle::new(&FONT_6X10, COLOR_FG),
     )
@@ -48,31 +57,40 @@ pub fn navigation(
     if now > 0.2 + state.entered && now > state.debounce + 0.2 {
         if render.button_x_pressed {
             match state.selected {
-                Setting::Wifi => {
-                    // app_state_next_state.set(AppState::Menu);
+                0 => {
+                    //
                 }
-                Setting::Back => {
+                1 => {
                     app_state_next_state.set(AppState::Menu);
+                }
+                _ => {
+                    //
                 }
             }
             state.debounce = now;
         } else if render.button_a_pressed {
             match state.selected {
-                Setting::Wifi => {
-                    // state.selected = Setting::Back;
+                0 => {
+                    //
                 }
-                Setting::Back => {
-                    state.selected = Setting::Wifi;
+                1 => {
+                    state.selected = 0;
+                }
+                _ => {
+                    //
                 }
             }
             state.debounce = now;
         } else if render.button_b_pressed {
             match state.selected {
-                Setting::Wifi => {
-                    state.selected = Setting::Back;
+                0 => {
+                    state.selected = 1;
                 }
-                Setting::Back => {
+                1 => {
                     // state.selected = Setting::Wifi;
+                }
+                _ => {
+                    //
                 }
             }
             state.debounce = now;
