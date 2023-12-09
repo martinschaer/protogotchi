@@ -7,20 +7,22 @@ Pre-requisite: musl-cross (Homebrew users: `brew install FiloSottile/musl-cross/
 https://github.com/FiloSottile/homebrew-musl-cross
 
 ```bash
+printf "%s" "Protogotchi hostname: " && read PROTOG_HOSTNAME
+printf "%s" "Protogotchi user: " && read PROSOG_USER
 # build for rpi zero 2 w
 cargo build --release --target=arm-unknown-linux-musleabihf
 # look at the size of the bin file
-ls -lh target/arm-unknown-linux-musleabihf/release/rustgotchi
+ls -lh target/arm-unknown-linux-musleabihf/release/protogotchi
 # strip it
-arm-linux-musleabihf-strip target/arm-unknown-linux-musleabihf/release/rustgotchi
+arm-linux-musleabihf-strip target/arm-unknown-linux-musleabihf/release/protogotchi
 # look at it now ;)
-ls -lh target/arm-unknown-linux-musleabihf/release/rustgotchi
+ls -lh target/arm-unknown-linux-musleabihf/release/protogotchi
 # copy over ssh
-scp target/arm-unknown-linux-musleabihf/release/rustgotchi martin@cozigotchi.local:~/
+scp target/arm-unknown-linux-musleabihf/release/protogotchi $PROTOG_USER@$PROTOG_HOSTNAME:~/
 # ssh into the rpi to run it
-ssh martin@cozigotchi.local
+ssh $PROSOG_USER@$PROTOG_HOSTNAME
 # run it
-./rustgotchi
+./protogotchi
 ```
 
 ### Linux
