@@ -6,12 +6,12 @@ use embedded_graphics::{
 };
 use embedded_graphics_framebuf::FrameBuf;
 
-use crate::AppState;
 use crate::Render;
 use crate::COLOR_BG;
 use crate::COLOR_FG;
 use crate::H_SIZE;
 use crate::W_SIZE;
+use crate::{AppState, CurrentRouteState};
 
 use super::resources::SelectState;
 
@@ -30,7 +30,7 @@ pub fn update(mut render: ResMut<Render>, state: Res<SelectState>) {
                     } else {
                         acc.push_str("\n  ");
                     }
-                    acc.push_str(o);
+                    acc.push_str(&o.label);
                     acc
                 });
         render.data.fill(COLOR_BG);
@@ -45,52 +45,52 @@ pub fn update(mut render: ResMut<Render>, state: Res<SelectState>) {
     }
 }
 
+fn parse_route(route: &str) -> (AppState, Vec<String>) {
+    let mut parts = route.split(':');
+    let state_name = parts.next().unwrap().trim();
+    let params: Vec<String> = match parts.next() {
+        Some(s) => s.split(',').map(|s| s.trim().to_owned()).collect(),
+        None => vec![],
+    };
+    let state = match state_name {
+        "menu" => AppState::Menu,
+        "settings" => AppState::Settings,
+        "wifi" => AppState::Wifi,
+        _ => AppState::Menu,
+    };
+    (state, params)
+}
+
 pub fn navigation(
     time: Res<Time>,
     mut app_state_next_state: ResMut<NextState<AppState>>,
     render: Res<Render>,
     mut state: ResMut<SelectState>,
+    mut route_state: ResMut<CurrentRouteState>,
 ) {
     let now = time.elapsed_seconds();
     if now > 0.2 + state.entered && now > state.debounce + 0.2 {
         if render.button_x_pressed {
-            match state.selected {
-                0 => {
-                    //
-                }
-                1 => {
-                    app_state_next_state.set(AppState::Menu);
-                    state.display = false;
-                }
-                _ => {
-                    //
-                }
-            }
+            // routing
+            let state_route = &state.options[state.selected];
+            let (goto_app_state, params) = parse_route(&state_route.route);
+            app_state_next_state.set(goto_app_state);
+            route_state.route = state_route.clone();
+            route_state.params = params;
+
+            state.display = false;
             state.debounce = now;
         } else if render.button_a_pressed {
-            match state.selected {
-                0 => {
-                    //
-                }
-                1 => {
-                    state.selected = 0;
-                }
-                _ => {
-                    //
-                }
+            if state.selected == 0 {
+                state.selected = state.options.len() - 1;
+            } else {
+                state.selected -= 1;
             }
             state.debounce = now;
         } else if render.button_b_pressed {
-            match state.selected {
-                0 => {
-                    state.selected = 1;
-                }
-                1 => {
-                    // state.selected = Setting::Wifi;
-                }
-                _ => {
-                    //
-                }
+            state.selected += 1;
+            if state.selected >= state.options.len() {
+                state.selected = 0;
             }
             state.debounce = now;
         }

@@ -29,8 +29,8 @@ use hardware::HardwarePlugin;
 use sim::SimPlugin;
 
 use menu::MenuPlugin;
-use plugins::select::SelectPlugin;
-use settings::SettingsPlugin;
+use plugins::select::{resources::StateRoute, SelectPlugin};
+use settings::{wifi::WifiPlugin, SettingsPlugin};
 use splash::SplashPlugin;
 
 // bg
@@ -45,6 +45,34 @@ const COLOR_PRIMARY: Rgb565 = Rgb565::new(0b0, 0b011110, 0b01110);
 
 const W_SIZE: usize = 320;
 const H_SIZE: usize = 240;
+
+#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
+pub enum AppState {
+    #[default]
+    Splash,
+    Menu,
+    Settings,
+    Wifi,
+    Input,
+}
+
+#[derive(Resource)]
+pub struct CurrentRouteState {
+    pub route: StateRoute,
+    pub params: Vec<String>,
+}
+
+impl Default for CurrentRouteState {
+    fn default() -> Self {
+        CurrentRouteState {
+            route: StateRoute {
+                label: String::from("Splash"),
+                route: String::from("splash"),
+            },
+            params: vec![],
+        }
+    }
+}
 
 #[derive(Resource)]
 pub struct Render {
@@ -95,6 +123,7 @@ fn main() {
 fn main() {
     App::new()
         .init_resource::<Render>()
+        .init_resource::<CurrentRouteState>()
         .add_state::<AppState>()
         // Bevy Plugins
         .add_plugins(DefaultPlugins)
@@ -104,16 +133,9 @@ fn main() {
         .add_plugins(SettingsPlugin)
         .add_plugins(SimPlugin)
         .add_plugins(SplashPlugin)
+        .add_plugins(WifiPlugin)
         // Systems
         .add_systems(Update, bevy::window::close_on_esc)
         // Run
         .run();
-}
-
-#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
-pub enum AppState {
-    #[default]
-    Splash,
-    Menu,
-    Settings,
 }

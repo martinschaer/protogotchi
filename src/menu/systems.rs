@@ -8,7 +8,7 @@ use embedded_graphics_framebuf::FrameBuf;
 use local_ip_address::local_ip;
 
 use super::resources::{MenuState, UIConfig};
-use crate::{AppState, Render, COLOR_BG, COLOR_FG, H_SIZE, W_SIZE};
+use crate::{AppState, CurrentRouteState, Render, StateRoute, COLOR_BG, COLOR_FG, H_SIZE, W_SIZE};
 
 pub fn startup(mut commands: Commands, mut game_state: ResMut<MenuState>) {
     commands.insert_resource(UIConfig {
@@ -60,11 +60,17 @@ pub fn render_loop(
 pub fn navigation(
     time: Res<Time>,
     mut app_state_next_state: ResMut<NextState<AppState>>,
+    mut route_state: ResMut<CurrentRouteState>,
     render: Res<Render>,
     state: Res<MenuState>,
 ) {
     let now = time.elapsed_seconds();
     if now > 0.2 + state.entered && render.button_x_pressed {
         app_state_next_state.set(AppState::Settings);
+        route_state.route = StateRoute {
+            label: String::from("Settings"),
+            route: String::from("settings"),
+        };
+        route_state.params = vec![];
     }
 }
