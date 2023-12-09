@@ -1,0 +1,10 @@
+[Unit]
+Description=Protogotchi
+After=multi-user.target
+
+[Service]
+ExecStart=/home/martin/protogotchi
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,34 @@
+---
+- name: Protogotchi setup
+  hosts: all
+
+  tasks:
+  # - name: Ensure is installed
+  #   ansible.builtin.apt:
+  #     name: libsdl2-2.0-0
+
+  - name: Ensure git is installed
+    ansible.builtin.apt:
+      name: git
+
+  # - name: Ensure pip is installed
+  #   ansible.builtin.apt:
+  #     name: pip
+
+  # - name: Install pygame python package
+  #   ansible.builtin.pip:
+  #     name: pygame
+  #     extra_args: --user
+
+  # - name: Install displayhatmini python package
+  #   ansible.builtin.pip:
+  #     name: displayhatmini
+  #     extra_args: --user
+
+  - name: Enable SPI
+    ansible.builtin.command: sudo raspi-config nonint do_spi 0
+
+  # - name: Ensure cmake is installed
+  #   ansible.builtin.apt:
+  #     name: cmake
+

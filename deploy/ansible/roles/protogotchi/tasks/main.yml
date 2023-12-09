@@ -1,0 +1,13 @@
+- name: Copy protogotchi.service to systemd
+  become: true
+  copy:
+    src: protogotchi.service
+    dest: /etc/systemd/system/protogotchi.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload systemd
+  become: true
+  systemd:
+    daemon_reload: yes
