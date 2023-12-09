@@ -4,6 +4,7 @@ mod hardware;
 #[cfg(target_os = "macos")]
 mod sim;
 
+mod input;
 mod menu;
 mod plugins;
 mod settings;
@@ -12,6 +13,7 @@ mod systems;
 
 use bevy::prelude::*;
 use embedded_graphics::pixelcolor::Rgb565;
+use std::collections::HashMap;
 
 #[cfg(target_os = "macos")]
 use bevy_pixels::prelude::*;
@@ -28,8 +30,9 @@ use hardware::HardwarePlugin;
 #[cfg(target_os = "macos")]
 use sim::SimPlugin;
 
+use input::InputPlugin;
 use menu::MenuPlugin;
-use plugins::select::{resources::StateRoute, SelectPlugin};
+use plugins::select::SelectPlugin;
 use settings::{wifi::WifiPlugin, SettingsPlugin};
 use splash::SplashPlugin;
 
@@ -56,22 +59,9 @@ pub enum AppState {
     Input,
 }
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 pub struct CurrentRouteState {
-    pub route: StateRoute,
     pub params: Vec<String>,
-}
-
-impl Default for CurrentRouteState {
-    fn default() -> Self {
-        CurrentRouteState {
-            route: StateRoute {
-                label: String::from("Splash"),
-                route: String::from("splash"),
-            },
-            params: vec![],
-        }
-    }
 }
 
 #[derive(Resource)]
@@ -96,6 +86,11 @@ impl Default for Render {
             button_y_pressed: false,
         }
     }
+}
+
+#[derive(Resource, Default)]
+pub struct DB {
+    pub records: HashMap<String, String>,
 }
 
 #[cfg(target_os = "linux")]
@@ -124,12 +119,14 @@ fn main() {
     App::new()
         .init_resource::<Render>()
         .init_resource::<CurrentRouteState>()
+        .init_resource::<DB>()
         .add_state::<AppState>()
         // Bevy Plugins
         .add_plugins(DefaultPlugins)
         // My Plugins
-        .add_plugins(SelectPlugin)
+        .add_plugins(InputPlugin)
         .add_plugins(MenuPlugin)
+        .add_plugins(SelectPlugin)
         .add_plugins(SettingsPlugin)
         .add_plugins(SimPlugin)
         .add_plugins(SplashPlugin)

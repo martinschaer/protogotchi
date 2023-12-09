@@ -17,8 +17,7 @@ use super::resources::SelectState;
 
 pub fn update(mut render: ResMut<Render>, state: Res<SelectState>) {
     if state.display {
-        render.data.fill(COLOR_FG);
-
+        // render.data.fill(COLOR_FG);
         let print_text =
             state
                 .options
@@ -56,6 +55,7 @@ fn parse_route(route: &str) -> (AppState, Vec<String>) {
         "menu" => AppState::Menu,
         "settings" => AppState::Settings,
         "wifi" => AppState::Wifi,
+        "input" => AppState::Input,
         _ => AppState::Menu,
     };
     (state, params)
@@ -69,13 +69,12 @@ pub fn navigation(
     mut route_state: ResMut<CurrentRouteState>,
 ) {
     let now = time.elapsed_seconds();
-    if now > 0.2 + state.entered && now > state.debounce + 0.2 {
+    if now > 0.2 + state.entered && now > state.debounce + 0.2 && state.display {
         if render.button_x_pressed {
             // routing
             let state_route = &state.options[state.selected];
             let (goto_app_state, params) = parse_route(&state_route.route);
             app_state_next_state.set(goto_app_state);
-            route_state.route = state_route.clone();
             route_state.params = params;
 
             state.display = false;
