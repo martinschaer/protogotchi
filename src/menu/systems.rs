@@ -15,7 +15,7 @@ pub fn startup(mut commands: Commands, mut game_state: ResMut<MenuState>) {
         character_style: MonoTextStyle::new(&FONT_6X10, COLOR_FG),
     });
 
-    let line = "**** Welcome to the cozigotchi terminal ^_^ ****\n\n";
+    let line = "**** Welcome to the Protogotchi terminal ^_^ ****\n\n";
     game_state.text.push_str(line);
 
     // get IP
