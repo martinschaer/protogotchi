@@ -111,11 +111,6 @@ pub fn navigation(
     if now > 0.2 + state.entered && render.button_x_pressed {
         // TODO: use a router fn
         app_state_next_state.set(AppState::Settings);
-        // route_state.route = state;
-        // route_state.route = StateRoute {
-        //     label: String::from("Settings"),
-        //     route: String::from("settings"),
-        // };
         route_state.params = vec![];
         // --
     }
