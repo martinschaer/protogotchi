@@ -54,9 +54,9 @@ impl Default for Hardware {
 
         Hardware {
             button_a: gpio.get(BUTTON_A).unwrap().into_input_pullup(),
-            button_b: gpio.get(BUTTON_B).unwrap().into_input(),
-            button_x: gpio.get(BUTTON_X).unwrap().into_input(),
-            button_y: gpio.get(BUTTON_Y).unwrap().into_input(),
+            button_b: gpio.get(BUTTON_B).unwrap().into_input_pullup(),
+            button_x: gpio.get(BUTTON_X).unwrap().into_input_pullup(),
+            button_y: gpio.get(BUTTON_Y).unwrap().into_input_pullup(),
             led_r: gpio.get(LED_R).unwrap().into_output(),
             led_g: gpio.get(LED_G).unwrap().into_output(),
             led_b: gpio.get(LED_B).unwrap().into_output(),
