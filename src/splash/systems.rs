@@ -19,7 +19,7 @@ pub fn update(
 ) {
     render.data.fill(COLOR_PRIMARY);
     let now = time.elapsed_seconds();
-    if now > 5. + state.entered {
+    if now > 0.1 + state.entered {
         app_state_next_state.set(AppState::Menu);
     }
 }

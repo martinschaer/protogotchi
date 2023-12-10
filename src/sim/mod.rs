@@ -21,8 +21,8 @@ fn render_loop(mut wrapper_query: Query<&mut PixelsWrapper>, render: ResMut<Rend
 }
 
 fn buttons(keyboard_input: Res<Input<KeyCode>>, mut render: ResMut<Render>) {
-    render.button_a_pressed = keyboard_input.pressed(KeyCode::A);
-    render.button_b_pressed = keyboard_input.pressed(KeyCode::B);
+    render.button_a_pressed = keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Up);
+    render.button_b_pressed = keyboard_input.pressed(KeyCode::B) || keyboard_input.pressed(KeyCode::Down);
     render.button_x_pressed = keyboard_input.pressed(KeyCode::X);
     render.button_y_pressed = keyboard_input.pressed(KeyCode::Y);
 }

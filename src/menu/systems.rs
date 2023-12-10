@@ -8,7 +8,7 @@ use embedded_graphics_framebuf::FrameBuf;
 use local_ip_address::local_ip;
 
 use super::resources::{MenuState, UIConfig};
-use crate::{AppState, Render, COLOR_BG, COLOR_FG, H_SIZE, W_SIZE};
+use crate::{AppState, CurrentRouteState, Render, COLOR_BG, COLOR_FG, DB, H_SIZE, W_SIZE};
 
 pub fn startup(mut commands: Commands, mut game_state: ResMut<MenuState>) {
     commands.insert_resource(UIConfig {
@@ -32,9 +32,52 @@ pub fn startup(mut commands: Commands, mut game_state: ResMut<MenuState>) {
     ));
 }
 
-pub fn on_enter(time: Res<Time>, mut state: ResMut<MenuState>) {
+pub fn on_enter(
+    time: Res<Time>,
+    route_state: ResMut<CurrentRouteState>,
+    db: Res<DB>,
+    mut state: ResMut<MenuState>,
+) {
     state.entered = time.elapsed_seconds();
     println!("menu entered");
+
+    if !route_state.params.is_empty() && route_state.params[0] == "connect" {
+        // sudo nmcli --ask dev wifi connect <example_ssid>
+        let ssid = match db.records.get("wifi.ssid") {
+            Some(s) => s,
+            None => "",
+        };
+        let pass = match db.records.get("wifi.password") {
+            Some(p) => p,
+            None => "",
+        };
+
+        #[cfg(target_os = "linux")]
+        let out = std::process::Command::new("nmcli")
+            .args(["dev", "wifi", "connect", ssid, "password", pass])
+            .spawn();
+
+        #[cfg(target_os = "macos")]
+        let out = std::process::Command::new("networksetup")
+            .args(["-setairportnetwork", "en0", ssid, pass])
+            .spawn();
+
+        #[cfg(target_os = "windows")]
+        let out = std::process::Command::new("netsh")
+            .args(["wlan", "connect", ssid, "password", pass])
+            .spawn();
+
+        match out {
+            Ok(_) => {
+                state
+                    .text
+                    .push_str(&format!("Connecting to network {}...\n", &ssid));
+            }
+            Err(x) => {
+                state.text.push_str(&format!("Error: {}\n", x));
+            }
+        }
+    }
 }
 
 pub fn render_loop(
@@ -60,11 +103,15 @@ pub fn render_loop(
 pub fn navigation(
     time: Res<Time>,
     mut app_state_next_state: ResMut<NextState<AppState>>,
+    mut route_state: ResMut<CurrentRouteState>,
     render: Res<Render>,
     state: Res<MenuState>,
 ) {
     let now = time.elapsed_seconds();
     if now > 0.2 + state.entered && render.button_x_pressed {
+        // TODO: use a router fn
         app_state_next_state.set(AppState::Settings);
+        route_state.params = vec![];
+        // --
     }
 }

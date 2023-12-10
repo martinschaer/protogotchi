@@ -1,9 +1,14 @@
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", target_arch = "arm"))]
 mod hardware;
 
-#[cfg(target_os = "macos")]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "windows",
+    all(target_os = "linux", not(target_arch = "arm"))
+))]
 mod sim;
 
+mod input;
 mod menu;
 mod plugins;
 mod settings;
@@ -12,25 +17,31 @@ mod systems;
 
 use bevy::prelude::*;
 use embedded_graphics::pixelcolor::Rgb565;
+use std::collections::HashMap;
 
 #[cfg(target_os = "macos")]
 use bevy_pixels::prelude::*;
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", target_arch = "arm"))]
 use bevy::app::ScheduleRunnerPlugin;
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", target_arch = "arm"))]
 use std::time::Duration;
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", target_arch = "arm"))]
 use hardware::HardwarePlugin;
 
-#[cfg(target_os = "macos")]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "windows",
+    all(target_os = "linux", not(target_arch = "arm"))
+))]
 use sim::SimPlugin;
 
+use input::InputPlugin;
 use menu::MenuPlugin;
 use plugins::select::SelectPlugin;
-use settings::SettingsPlugin;
+use settings::{wifi::WifiPlugin, SettingsPlugin};
 use splash::SplashPlugin;
 
 // bg
@@ -45,6 +56,21 @@ const COLOR_PRIMARY: Rgb565 = Rgb565::new(0b0, 0b011110, 0b01110);
 
 const W_SIZE: usize = 320;
 const H_SIZE: usize = 240;
+
+#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
+pub enum AppState {
+    #[default]
+    Splash,
+    Menu,
+    Settings,
+    Wifi,
+    Input,
+}
+
+#[derive(Resource, Default)]
+pub struct CurrentRouteState {
+    pub params: Vec<String>,
+}
 
 #[derive(Resource)]
 pub struct Render {
@@ -70,7 +96,12 @@ impl Default for Render {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[derive(Resource, Default)]
+pub struct DB {
+    pub records: HashMap<String, String>,
+}
+
+#[cfg(all(target_os = "linux", target_arch = "arm"))]
 fn main() {
     App::new()
         .init_resource::<Render>()
@@ -81,39 +112,41 @@ fn main() {
             ))),
         )
         // My Plugins
+        .add_plugins(InputPlugin)
         .add_plugins(SelectPlugin)
         .add_plugins(HardwarePlugin)
         .add_plugins(MenuPlugin)
         .add_plugins(SettingsPlugin)
         .add_plugins(SplashPlugin)
+        .add_plugins(WifiPlugin)
         // Systems
         // Run
         .run();
 }
 
-#[cfg(target_os = "macos")]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "windows",
+    all(target_os = "linux", not(target_arch = "arm"))
+))]
 fn main() {
     App::new()
         .init_resource::<Render>()
+        .init_resource::<CurrentRouteState>()
+        .init_resource::<DB>()
         .add_state::<AppState>()
         // Bevy Plugins
         .add_plugins(DefaultPlugins)
         // My Plugins
-        .add_plugins(SelectPlugin)
+        .add_plugins(InputPlugin)
         .add_plugins(MenuPlugin)
+        .add_plugins(SelectPlugin)
         .add_plugins(SettingsPlugin)
         .add_plugins(SimPlugin)
         .add_plugins(SplashPlugin)
+        .add_plugins(WifiPlugin)
         // Systems
         .add_systems(Update, bevy::window::close_on_esc)
         // Run
         .run();
-}
-
-#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
-pub enum AppState {
-    #[default]
-    Splash,
-    Menu,
-    Settings,
 }

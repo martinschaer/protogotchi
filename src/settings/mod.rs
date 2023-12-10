@@ -1,4 +1,5 @@
 mod systems;
+pub mod wifi;
 
 use bevy::prelude::*;
 
