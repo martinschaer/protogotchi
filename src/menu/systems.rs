@@ -6,6 +6,7 @@ use embedded_graphics::{
 };
 use embedded_graphics_framebuf::FrameBuf;
 use local_ip_address::local_ip;
+use std::io::Result;
 
 use super::resources::{MenuState, UIConfig};
 use crate::{AppState, CurrentRouteState, Render, COLOR_BG, COLOR_FG, DB, H_SIZE, W_SIZE};
@@ -32,6 +33,32 @@ pub fn startup(mut commands: Commands, mut game_state: ResMut<MenuState>) {
     ));
 }
 
+#[cfg(target_os = "linux")]
+fn wifi_connect(ssid: &str, pass: &str) -> Result<String> {
+    // read wpa_supplicant.conf
+    let mut content = std::fs::read_to_string("/etc/wpa_supplicant/wpa_supplicant.conf")?;
+    let psk = std::process::Command::new("wpa_passphrase")
+        .args([ssid, pass])
+        .output()
+        .unwrap();
+    let psk = String::from_utf8(psk.stdout).unwrap();
+
+    content.push_str(&psk);
+    std::fs::write(format!("/etc/wpa_supplicant/{}.conf", ssid), content).unwrap();
+    // backup wpa_supplicant.conf
+    _ = std::fs::copy(
+        "/etc/wpa_supplicant/wpa_supplicant.conf",
+        "/etc/wpa_supplicant/wpa_supplicant.conf.bak",
+    );
+
+    // update wpa_supplicant.conf
+    _ = std::fs::copy(
+        format!("/etc/wpa_supplicant/{}.conf", ssid),
+        "/etc/wpa_supplicant/wpa_supplicant.conf",
+    );
+    Ok(ssid.to_owned())
+}
+
 pub fn on_enter(
     time: Res<Time>,
     route_state: ResMut<CurrentRouteState>,
@@ -53,9 +80,7 @@ pub fn on_enter(
         };
 
         #[cfg(target_os = "linux")]
-        let out = std::process::Command::new("nmcli")
-            .args(["dev", "wifi", "connect", ssid, "password", pass])
-            .spawn();
+        let out = wifi_connect(ssid, pass);
 
         #[cfg(target_os = "macos")]
         let out = std::process::Command::new("networksetup")
