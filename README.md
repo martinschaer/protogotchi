@@ -1,4 +1,12 @@
-## Build, strip, copy, and run
+# Protogotchi
+
+A virtual pet that fits in a Raspberry Pi with an LCD display.
+
+![Main screen](./assets/screenshot-menu.png)
+
+![Text input](./assets/screenshot-input.png)
+
+## Build, strip, copy over SSH, and run
 
 ### Mac OS
 
