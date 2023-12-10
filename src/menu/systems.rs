@@ -56,7 +56,19 @@ fn wifi_connect(ssid: &str, pass: &str) -> Result<String> {
         format!("/etc/wpa_supplicant/{}.conf", ssid),
         "/etc/wpa_supplicant/wpa_supplicant.conf",
     );
-    Ok(ssid.to_owned())
+
+    // find network id
+    let out = std::process::Command::new("wpa_cli")
+        .args(["-i", "wlan0", "list_networks", "|", "grep", ssid])
+        .output()?;
+    let network_id = String::from_utf8(out.stdout).unwrap();
+    let network_id = network_id.split_whitespace().collect::<Vec<_>>()[0];
+
+    // select network
+    let out = std::process::Command::new("wpa_cli")
+        .args(["-i", "wlan0", "select_network", network_id])
+        .output()?;
+    Ok(String::from_utf8(out.stdout).unwrap())
 }
 
 pub fn on_enter(
