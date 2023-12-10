@@ -16,7 +16,7 @@ https://github.com/FiloSottile/homebrew-musl-cross
 
 ```bash
 printf "%s" "Protogotchi hostname: " && read PROTOG_HOSTNAME
-printf "%s" "Protogotchi user: " && read PROSOG_USER
+printf "%s" "Protogotchi user: " && read PROTOG_USER
 # build for rpi zero 2 w
 cargo build --release --target=arm-unknown-linux-musleabihf
 # look at the size of the bin file
@@ -28,7 +28,7 @@ ls -lh target/arm-unknown-linux-musleabihf/release/protogotchi
 # copy over ssh
 scp target/arm-unknown-linux-musleabihf/release/protogotchi $PROTOG_USER@$PROTOG_HOSTNAME:~/
 # ssh into the rpi to run it
-ssh $PROSOG_USER@$PROTOG_HOSTNAME
+ssh $PROTOG_USER@$PROTOG_HOSTNAME
 # run it
 ./protogotchi
 ```

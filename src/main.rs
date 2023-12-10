@@ -105,6 +105,9 @@ pub struct DB {
 fn main() {
     App::new()
         .init_resource::<Render>()
+        .init_resource::<CurrentRouteState>()
+        .init_resource::<DB>()
+        .add_state::<AppState>()
         // Bevy Plugins
         .add_plugins(
             MinimalPlugins.set(ScheduleRunnerPlugin::run_loop(Duration::from_secs_f64(
@@ -112,10 +115,10 @@ fn main() {
             ))),
         )
         // My Plugins
-        .add_plugins(InputPlugin)
-        .add_plugins(SelectPlugin)
         .add_plugins(HardwarePlugin)
+        .add_plugins(InputPlugin)
         .add_plugins(MenuPlugin)
+        .add_plugins(SelectPlugin)
         .add_plugins(SettingsPlugin)
         .add_plugins(SplashPlugin)
         .add_plugins(WifiPlugin)
