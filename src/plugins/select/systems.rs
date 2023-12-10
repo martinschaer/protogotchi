@@ -13,7 +13,7 @@ use crate::H_SIZE;
 use crate::W_SIZE;
 use crate::{AppState, CurrentRouteState};
 
-use super::resources::SelectState;
+use super::{parse_route, resources::SelectState};
 
 pub fn update(mut render: ResMut<Render>, state: Res<SelectState>) {
     if state.display {
@@ -42,23 +42,6 @@ pub fn update(mut render: ResMut<Render>, state: Res<SelectState>) {
         .draw(&mut fbuf)
         .unwrap();
     }
-}
-
-fn parse_route(route: &str) -> (AppState, Vec<String>) {
-    let mut parts = route.split(':');
-    let state_name = parts.next().unwrap().trim();
-    let params: Vec<String> = match parts.next() {
-        Some(s) => s.split(',').map(|s| s.trim().to_owned()).collect(),
-        None => vec![],
-    };
-    let state = match state_name {
-        "menu" => AppState::Menu,
-        "settings" => AppState::Settings,
-        "wifi" => AppState::Wifi,
-        "input" => AppState::Input,
-        _ => AppState::Menu,
-    };
-    (state, params)
 }
 
 pub fn navigation(

@@ -1,7 +1,11 @@
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", target_arch = "arm"))]
 mod hardware;
 
-#[cfg(target_os = "macos")]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "windows",
+    all(target_os = "linux", not(target_arch = "arm"))
+))]
 mod sim;
 
 mod input;
@@ -18,16 +22,20 @@ use std::collections::HashMap;
 #[cfg(target_os = "macos")]
 use bevy_pixels::prelude::*;
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", target_arch = "arm"))]
 use bevy::app::ScheduleRunnerPlugin;
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", target_arch = "arm"))]
 use std::time::Duration;
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", target_arch = "arm"))]
 use hardware::HardwarePlugin;
 
-#[cfg(target_os = "macos")]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "windows",
+    all(target_os = "linux", not(target_arch = "arm"))
+))]
 use sim::SimPlugin;
 
 use input::InputPlugin;
@@ -93,7 +101,7 @@ pub struct DB {
     pub records: HashMap<String, String>,
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", target_arch = "arm"))]
 fn main() {
     App::new()
         .init_resource::<Render>()
@@ -104,17 +112,23 @@ fn main() {
             ))),
         )
         // My Plugins
+        .add_plugins(InputPlugin)
         .add_plugins(SelectPlugin)
         .add_plugins(HardwarePlugin)
         .add_plugins(MenuPlugin)
         .add_plugins(SettingsPlugin)
         .add_plugins(SplashPlugin)
+        .add_plugins(WifiPlugin)
         // Systems
         // Run
         .run();
 }
 
-#[cfg(target_os = "macos")]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "windows",
+    all(target_os = "linux", not(target_arch = "arm"))
+))]
 fn main() {
     App::new()
         .init_resource::<Render>()

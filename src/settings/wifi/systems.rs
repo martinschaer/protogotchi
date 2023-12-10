@@ -9,11 +9,15 @@ pub fn on_enter(time: Res<Time>, mut state: ResMut<SelectState>) {
     state.options = vec![
         StateRoute {
             label: String::from("Network Name"),
-            route: String::from("input: wifi.ssid"),
+            route: String::from("input: wifi.ssid, wifi"),
         },
         StateRoute {
             label: String::from("Password"),
-            route: String::from("input: wifi.password"),
+            route: String::from("input: wifi.password, wifi"),
+        },
+        StateRoute {
+            label: String::from("Connect"),
+            route: String::from("connect: connect"),
         },
         StateRoute {
             label: String::from("Back"),

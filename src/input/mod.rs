@@ -33,6 +33,7 @@ const LAYER_4: &str = "!@#$%^&*()_+<>?:{}|~";
 
 enum Special {
     Enter(String),
+    Space(String),
     Backspace(String),
     Shift(String),
     Symbols(String),
@@ -57,6 +58,7 @@ impl Plugin for InputPlugin {
             ],
             special: vec![
                 Special::Enter(String::from("Enter")),
+                Special::Space(String::from("Space")),
                 Special::Backspace(String::from("<-")),
                 Special::Shift(String::from("Shift")),
                 Special::Symbols(String::from("!@#")),

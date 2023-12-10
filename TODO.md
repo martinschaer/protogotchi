@@ -1,7 +1,7 @@
 # TO-DO
 
-- UI menu to set wi-fi password
-    - set wi-fi password (is it writing it on a config file? is a reboot required?)
+- test wifi connection on raspberry pi
+- check wifi status in background
 - load and run Lua scripts
     - writes to an image buffer which is rendered by bevy
     - reads button states

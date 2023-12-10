@@ -7,7 +7,10 @@ use embedded_graphics::{
 };
 use embedded_graphics_framebuf::FrameBuf;
 
-use crate::{AppState, CurrentRouteState, Render, COLOR_BG, COLOR_FG, DB, H_SIZE, W_SIZE};
+use crate::{
+    plugins::select::parse_route, AppState, CurrentRouteState, Render, COLOR_BG, COLOR_FG, DB,
+    H_SIZE, W_SIZE,
+};
 
 use super::{InputState, Keyboard, Special};
 
@@ -63,7 +66,11 @@ pub fn render(state: Res<InputState>, keyboard: Res<Keyboard>, mut render: ResMu
     // special
     for (i, special) in keyboard.special.iter().enumerate() {
         match special {
-            Special::Enter(s) | Special::Shift(s) | Special::Symbols(s) | Special::Backspace(s) => {
+            Special::Enter(s)
+            | Special::Shift(s)
+            | Special::Symbols(s)
+            | Special::Backspace(s)
+            | Special::Space(s) => {
                 build_button(s, (i + keys.len()) as i32, cols, col_w, row_h)
                     .draw(&mut fbuf)
                     .unwrap();
@@ -139,12 +146,20 @@ pub fn update(
                             input_state.result.clear();
                         }
                         // TODO: use a router fn
-                        app_state_next_state.set(AppState::Settings);
-                        route_state.params = vec![];
+                        let (goto_app_state, params) = if route_state.params.len() > 1 {
+                            parse_route(&route_state.params[1])
+                        } else {
+                            (AppState::Settings, vec![])
+                        };
+                        app_state_next_state.set(goto_app_state);
+                        route_state.params = params;
                         // --
                     }
                     Special::Backspace(_) => {
                         input_state.result.pop();
+                    }
+                    Special::Space(_) => {
+                        input_state.result.push(' ');
                     }
                     Special::Shift(_) => {
                         input_state.layer = match input_state.layer {
