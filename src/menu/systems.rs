@@ -1,3 +1,6 @@
+#[cfg(target_os = "linux")]
+use std::io::{Error, ErrorKind};
+
 use bevy::prelude::*;
 use embedded_graphics::{
     mono_font::{ascii::FONT_6X10, MonoTextStyle},
@@ -6,7 +9,6 @@ use embedded_graphics::{
 };
 use embedded_graphics_framebuf::FrameBuf;
 use local_ip_address::local_ip;
-use std::io::Result;
 
 use super::resources::{MenuState, UIConfig};
 use crate::{AppState, CurrentRouteState, Render, COLOR_BG, COLOR_FG, DB, H_SIZE, W_SIZE};
@@ -16,7 +18,7 @@ pub fn startup(mut commands: Commands, mut game_state: ResMut<MenuState>) {
         character_style: MonoTextStyle::new(&FONT_6X10, COLOR_FG),
     });
 
-    let line = "**** Welcome to the Protogotchi terminal ^_^ ****\n\n";
+    let line = "**** Welcome to the Protogotchi terminal ^_^ ****\n\nv0.3\n\n";
     game_state.text.push_str(line);
 
     // get IP
@@ -34,7 +36,7 @@ pub fn startup(mut commands: Commands, mut game_state: ResMut<MenuState>) {
 }
 
 #[cfg(target_os = "linux")]
-fn wifi_connect(ssid: &str, pass: &str) -> Result<String> {
+fn wifi_connect(ssid: &str, pass: &str) -> Result<String, Error> {
     // read wpa_supplicant.conf
     let mut content = std::fs::read_to_string("/etc/wpa_supplicant/wpa_supplicant.conf")?;
     let psk = std::process::Command::new("wpa_passphrase")
@@ -57,17 +59,42 @@ fn wifi_connect(ssid: &str, pass: &str) -> Result<String> {
         "/etc/wpa_supplicant/wpa_supplicant.conf",
     );
 
+    // reload wpa_supplicant
+    std::process::Command::new("wpa_cli")
+        .args(["-i", "wlan0", "reconfigure"])
+        .output()?;
+
     // find network id
     let out = std::process::Command::new("wpa_cli")
-        .args(["-i", "wlan0", "list_networks", "|", "grep", ssid])
+        .args(["-i", "wlan0", "list_networks"])
         .output()?;
-    let network_id = String::from_utf8(out.stdout).unwrap();
-    let network_id = network_id.split_whitespace().collect::<Vec<_>>()[0];
 
-    // select network
-    let out = std::process::Command::new("wpa_cli")
-        .args(["-i", "wlan0", "select_network", network_id])
+    // skip first line
+    let list: String = String::from_utf8(out.stdout).unwrap();
+    list.lines().next();
+    let mut network_id = None;
+    for line in list.lines() {
+        let fields = line.split_whitespace().collect::<Vec<_>>();
+        if fields[1] == ssid {
+            network_id = Some(fields[0].to_string());
+            break;
+        }
+    }
+    if network_id.is_none() {
+        return Err(Error::new(ErrorKind::Other, "Network not found"));
+    }
+    let network_id = network_id.unwrap();
+
+    // set priority
+    std::process::Command::new("wpa_cli")
+        .args(["-i", "wlan0", "set_network", &network_id, "priority", "2"])
         .output()?;
+
+    // reassociate
+    let out = std::process::Command::new("wpa_cli")
+        .args(["-i", "wlan0", "reconfigure"])
+        .output()?;
+
     Ok(String::from_utf8(out.stdout).unwrap())
 }
 
